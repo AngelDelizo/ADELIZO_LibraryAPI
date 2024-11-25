@@ -1,6 +1,16 @@
 # Library API
 
-The **Library API** is a RESTful service for managing a library system. It includes functionalities for managing users, authors, books, and the relationships between books and authors. This API uses JSON Web Tokens (JWT) for secure authentication and supports complete CRUD operations.
+The **Library API** is a RESTful library system management service. It includes functionalities for managing users, authors, books, and the relationships between books and authors. This API uses JSON Web Tokens (JWT) for secure authentication and supports complete CRUD operations.
+
+## Table of Contents
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Authentication](#authentication)
+  - [Overview](#overview)
+  - [Token Management](#token-management)
+  - [Authentication Flow](#authentication-flow)
+- [Endoints](#crud-operations)
+- [CRUD Operations](#crud-operations)
 
 ## Features
 - **RESTful Architecture**: Supports standard HTTP methods (GET, POST, PUT, DELETE).
@@ -15,9 +25,14 @@ The **Library API** is a RESTful service for managing a library system. It inclu
 - **Slim Framework**: For building the API structure.
 - **Firebase JWT Library**: For token generation and validation.
 - **Composer**: Dependency management.
+- **MySQL**:
+  - Relational database to store user, author, book, and relationship data.
+  - Structured with normalized tables for efficient queries.
+  - Ensures data integrity with primary/foreign keys and constraints.
+
 ---
 
-## Authentication (JWT)
+## Authentication
 
 ### Overview
 
@@ -28,65 +43,82 @@ The API uses JWT for authenticating requests. Upon login, users receive a token 
 - Each token is unique and stored temporarily.
 - Tokens are validated and checked for reuse.
 - Expired or reused tokens will result in an authentication failure.
+  
+### Authentication Flow
 
+1. User logs in with valid credentials.
+2. API returns a JWT.
+3. The user includes the token in the `Authorization` header (`Bearer <token>`) for subsequent requests.
+4. API validates the token before processing requests.
+   
 ---
-#  ENDPOINTS(total:17)
-- /user/login
-- /users/register
-- /users/read
-- /user/update
-- /users/delete
-- /author/add
-- /authors/read
-- /author/update
-- /author/delete
-- /book/add
-- /books/read
-- /book/update
-- /book/delete
-- /book_author/add
-- /book_authors/read
-- /book_author/update
-- /book_authors/delete
+## Endpoints (Total: 17)
+
+| **Endpoint**          | **Method** | **Description**                          |
+|-----------------------|------------|------------------------------------------|
+| `/user/login`         | `POST`     | Authenticate user and return JWT.        |
+| `/users/register`     | `POST`     | Register a new user.                     |
+| `/users/read`         | `GET`      | Retrieve all registered users.           |
+| `/user/update`        | `PUT`      | Update user details.                     |
+| `/users/delete`       | `DELETE`   | Delete a user.                           |
+| `/author/add`         | `POST`     | Add a new author.                        |
+| `/authors/read`       | `GET`      | Retrieve all authors.                    |
+| `/author/update`      | `PUT`      | Update author details.                   |
+| `/author/delete`      | `DELETE`   | Delete an author.                        |
+| `/book/add`           | `POST`     | Add a new book.                          |
+| `/books/read`         | `GET`      | Retrieve all books.                      |
+| `/book/update`        | `PUT`      | Update book details.                     |
+| `/book/delete`        | `DELETE`   | Delete a book.                           |
+| `/book_author/add`    | `POST`     | Associate a book with an author.         |
+| `/book_authors/read`  | `GET`      | Retrieve all book-author relationships.  |
+| `/book_author/update` | `PUT`      | Update book-author relationship.         |
+| `/book_authors/delete`| `DELETE`   | Delete a book-author relationship.       |
+
   
 #  CRUD OPERATIONS
 ## 1. USER
-### 1.1 User authentication or Login
-  - **Endpoint:** `/user/authenticate`  
-  - **Method:** `POST`  
-  - **Description:** 
-    Validates user credentials by checking the provided username and password against the database. If authentication is successful, a JSON Web Token (JWT) is generated and returned for secure session handling.
-- **Sample Request(JSON):**
-      ```json
-          {
-            "username": "newuser",
-            "password": "password123"
-          }
-      ```
+### 1.1 User Authentication or Login
+- **Endpoint:** `/user/authenticate`  
+
+- **Method:** `POST`  
+
+- **Description:** 
+    Validate user credentials by checking the provided username and password in the database. If authentication is successful, a JSON Web Token (JWT) is generated and returned for secure session handling.
+
+- **Sample Request (JSON):**
+    ```json
+    {
+        "username": "newuser",
+        "password": "password123"
+    }
+    ```
+
 - **Response:**
-      - **Success**
-          ```json
-              {
-                  "status": "success",
-                  "token": "<access_token>",
-                  "data": null
-              }
-          ```
-      - **Failure (Authenthication Failed):**
-          ```json
-              {
-                  "status": "fail",
-                  "data": {
-                      "title": "Authentication Failed!"
-                  }
-              }
-          ```
+    - **Success:**
+        ```json
+        {
+            "status": "success",
+            "token": "<access_token>",
+            "data": null
+        }
+        ```
+
+    - **Failure (Authentication Failed):**
+        ```json
+        {
+            "status": "fail",
+            "data": "Authentication Failed!"
+        }
+        ```
 ---
 ### 1.2 Create/Add/Register a new user
-- **Endpoint:** `/user/register`  
-- **Method:** `POST`  
+- **Endpoint:** `/user/register`
+   
+- **Method:** `POST`
+  
 - **Description:**  
   Creates a new user account by accepting a unique username and password. Ensures both inputs are at least 3 characters long.
+
 - **Sample Request (JSON):**
     ```json
     {
@@ -560,7 +592,7 @@ Retrieves a list of all users with their IDs and usernames.
 
 
 
-## 4 BOOK & AUTHOR RELATIONSHIP
+## 4. BOOK & AUTHOR RELATIONSHIP
 ### 4.1 Create a new book-author relationship
 - **Endpoint:** `/book_author/add`  
 - **Method:** `POST`  
